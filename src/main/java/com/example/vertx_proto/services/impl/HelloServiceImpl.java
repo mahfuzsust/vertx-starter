@@ -15,8 +15,7 @@ public class HelloServiceImpl implements HelloService {
 
 	@Override
 	public Future<HelloResponse> sayHello(HelloRequest request) {
-		userRepository.save(new User(1L, request.getName()))
-			.onSuccess(user -> System.out.println("User saved: " + user))
+		userRepository.save(new User(request.getName()))
 			.onFailure(err -> System.err.println("Failed to save user: " + err.getMessage()));
 
 		return userRepository.findById(1L)

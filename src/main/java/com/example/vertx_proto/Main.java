@@ -1,10 +1,13 @@
 package com.example.vertx_proto;
 
+import com.example.vertx_proto.utils.HibernateUtil;
 import com.example.vertx_proto.verticles.HttpVerticle;
 import com.example.vertx_proto.verticles.ServiceRegistryVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,7 +18,7 @@ import static java.lang.System.currentTimeMillis;
 public class Main {
 	public static void main(String[] args) {
 		long startTime = currentTimeMillis();
-
+		createTable();
 		VertxOptions vertxOptions = new VertxOptions()
 			.setWarningExceptionTime(10).setWarningExceptionTimeUnit(TimeUnit.SECONDS)
 			.setMaxEventLoopExecuteTime(20).setMaxEventLoopExecuteTimeUnit((TimeUnit.SECONDS));
@@ -31,4 +34,24 @@ public class Main {
 			.onSuccess(ok -> System.out.printf("✅ Application started in %d ms\n", (currentTimeMillis() - startTime)))
 			.onFailure(Throwable::printStackTrace);
 	}
+
+	public static void createTable() {
+		Session session = HibernateUtil.getSessionFactory().openSession();
+		Transaction tx = session.beginTransaction();
+
+		try {
+			session.createNativeQuery(
+				"CREATE TABLE IF NOT EXISTS users (" +
+					"id SERIAL PRIMARY KEY, " +
+					"name VARCHAR(255) NOT NULL " +
+					")"
+			).executeUpdate();
+		} catch (Exception e) {
+			e.printStackTrace();
+			tx.rollback();
+		} finally {
+			session.close();
+		}
+	}
+
 }
