@@ -6,5 +6,4 @@ public interface CrudRepository<T, ID> {
 	Future<T> save(T entity);
 	Future<Void> deleteById(ID id);
 	Future<T> findById(ID id);
-	Future<T> update(T entity, ID id);
 }

@@ -6,6 +6,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class BaseRepository {
@@ -54,15 +55,12 @@ public abstract class BaseRepository {
 		return false;
 	}
 
-	protected <T, ID> T updateEntity(T item, ID id) {
-		executeInTransaction(em -> {
-			Optional<T> entity = (Optional<T>) findEntity(item.getClass(), id);
-			if (entity.isPresent()) {
-				return em.merge(item);
-			} else {
-				throw new RuntimeException("Entity not found");
-			}
+	protected <T, ID> Optional<T> updateById(Consumer<T> updater, ID id, Class<T> classType) {
+		return executeInTransaction(em -> {
+			T existing = em.find(classType, id);
+			if (existing == null) return Optional.empty();
+			updater.accept(existing);
+			return Optional.of(existing);
 		});
-		return null;
 	}
 }

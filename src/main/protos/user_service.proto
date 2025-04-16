@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+option java_multiple_files = true;
+option java_package = "com.example.vertx_proto";
+option java_outer_classname = "UserServiceProto";
+
+import "google/protobuf/empty.proto";
+
+message SaveUserRequest {
+	int64 id = 1;
+	string name = 2;
+}
+
+message GetUserRequest {
+	int64 id = 1;
+}
+
+message GetUserResponse {
+	string name = 1;
+}
+
+message DeleteUserRequest {
+	int64 id = 1;
+}
+
+service UserService {
+	rpc Create (SaveUserRequest) returns (google.protobuf.Empty);
+	rpc Update (SaveUserRequest) returns (google.protobuf.Empty);
+	rpc Get (GetUserRequest) returns (GetUserResponse);
+	rpc Delete (DeleteUserRequest) returns (google.protobuf.Empty);
+}

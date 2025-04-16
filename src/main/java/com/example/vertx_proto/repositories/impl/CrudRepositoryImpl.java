@@ -6,6 +6,7 @@ import io.vertx.core.Future;
 
 import java.lang.reflect.ParameterizedType;
 import java.util.Optional;
+import java.util.function.Consumer;
 
 public abstract class CrudRepositoryImpl<T, ID> extends BaseRepository implements CrudRepository<T, ID> {
 	private final Class<T> entityClass;
@@ -37,10 +38,10 @@ public abstract class CrudRepositoryImpl<T, ID> extends BaseRepository implement
 		return entity.map(Future::succeededFuture).orElseGet(() -> Future.failedFuture(new Exception("Entity not found")));
 	}
 
-	@Override
-	public Future<T> update(T entity, ID id) {
+	public Future<T> update(Consumer<T> entity, ID id) {
 		try {
-			return Future.succeededFuture(updateEntity(entity, id));
+			Optional<T> t = updateById(entity, id, entityClass);
+			return t.map(Future::succeededFuture).orElseGet(() -> Future.failedFuture(new Exception("Failed to update")));
 		} catch (Exception e) {
 			return Future.failedFuture(new Exception("Failed to update"));
 		}

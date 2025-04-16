@@ -1,12 +1,9 @@
 package com.example.vertx_proto.verticles;
 
-import com.example.proto.HelloRequest;
-import com.example.proto.HelloResponse;
-import com.example.vertx_proto.codecs.ProtoMessageCodec;
-import com.example.vertx_proto.handlers.HelloHandler;
+import com.example.vertx_proto.handlers.UserHandler;
 import com.example.vertx_proto.repositories.UserRepository;
-import com.example.vertx_proto.services.HelloService;
-import com.example.vertx_proto.services.impl.HelloServiceImpl;
+import com.example.vertx_proto.services.UserService;
+import com.example.vertx_proto.services.impl.UserServiceImpl;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.ext.web.Router;
@@ -16,9 +13,6 @@ import io.vertx.serviceproxy.ServiceProxyBuilder;
 public class HttpVerticle extends AbstractVerticle {
 	@Override
 	public void start(Promise<Void> startPromise) {
-		vertx.eventBus().registerDefaultCodec(HelloRequest.class, new ProtoMessageCodec<>(HelloRequest.getDefaultInstance()));
-		vertx.eventBus().registerDefaultCodec(HelloResponse.class, new ProtoMessageCodec<>(HelloResponse.getDefaultInstance()));
-
 		Router rootRouter = Router.router(vertx);
 		rootRouter.route().handler(BodyHandler.create());
 
@@ -28,10 +22,9 @@ public class HttpVerticle extends AbstractVerticle {
 			.setAddress(UserRepository.ADDRESS);
 
 		UserRepository repository = builder.build(UserRepository.class);
-
-		HelloService helloService = new HelloServiceImpl(repository);
-		HelloHandler helloHandler = new HelloHandler(helloService);
-		helloHandler.mountRoutes(apiRouter);
+		UserService userService = new UserServiceImpl(repository);
+		UserHandler userHandler = new UserHandler(userService);
+		userHandler.mountRoutes(apiRouter);
 
 		rootRouter.route("/api/v1/*").subRouter(apiRouter);
 
