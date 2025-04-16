@@ -1,6 +1,7 @@
 package com.example.vertx_proto;
 
 import com.example.vertx_proto.verticles.HttpVerticle;
+import com.example.vertx_proto.verticles.ServiceRegistryVerticle;
 import io.vertx.core.Future;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
@@ -21,8 +22,10 @@ public class Main {
 		Vertx vertx = Vertx.vertx(vertxOptions);
 
 		List<Future<String>> futures = new ArrayList<>();
-		Future<String> periodicProducerDeployment = vertx.deployVerticle(new HttpVerticle());
-		futures.add(periodicProducerDeployment);
+		Future<String> httpVerticle = vertx.deployVerticle(new HttpVerticle());
+		Future<String> serviceRegistryVerticle = vertx.deployVerticle(new ServiceRegistryVerticle());
+		futures.add(httpVerticle);
+		futures.add(serviceRegistryVerticle);
 
 		Future.join(futures)
 			.onSuccess(ok -> System.out.printf("✅ Application started in %d ms\n", (currentTimeMillis() - startTime)))
