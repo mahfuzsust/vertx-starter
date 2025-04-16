@@ -1,10 +1,13 @@
 package com.example.vertx_proto.utils;
 
-import com.example.vertx_proto.models.User;
+import jakarta.persistence.Entity;
 import org.hibernate.SessionFactory;
 
 import org.hibernate.cfg.Configuration;
+import org.reflections.Reflections;
+
 import java.util.Properties;
+import java.util.Set;
 
 public class HibernateUtil {
 	private static final SessionFactory sessionFactory = buildSessionFactory();
@@ -19,10 +22,16 @@ public class HibernateUtil {
 		props.setProperty("hibernate.hbm2ddl.auto", "update");
 		props.setProperty("hibernate.show_sql", "true");
 
-		return new Configuration()
-			.addProperties(props)
-			.addAnnotatedClass(User.class)
-			.buildSessionFactory();
+		Configuration configuration = new Configuration()
+			.addProperties(props);
+
+		Reflections reflections = new Reflections("com.example.vertx_proto.models");
+
+		Set<Class<?>> entities = reflections.getTypesAnnotatedWith(Entity.class);
+		for (Class<?> entity : entities) {
+			configuration.addAnnotatedClass(entity);
+		}
+		return configuration.buildSessionFactory();
 	}
 
 	public static SessionFactory getSessionFactory() {

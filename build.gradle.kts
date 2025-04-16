@@ -43,6 +43,7 @@ dependencies {
 	implementation("org.hibernate.orm:hibernate-core:6.6.13.Final")
 	implementation("jakarta.persistence:jakarta.persistence-api:3.2.0")
 	implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
+	implementation("org.reflections:reflections:0.10.2")
 
 	annotationProcessor("io.vertx:vertx-codegen:${vertxVersion}:processor")
 
