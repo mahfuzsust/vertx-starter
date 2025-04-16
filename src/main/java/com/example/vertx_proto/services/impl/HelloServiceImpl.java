@@ -18,7 +18,7 @@ public class HelloServiceImpl implements HelloService {
 		userRepository.save(new User(request.getName()))
 			.onFailure(err -> System.err.println("Failed to save user: " + err.getMessage()));
 
-		return userRepository.findById(1L)
+		return userRepository.getById(1L)
 			.compose(user -> {
 				HelloResponse response = HelloResponse.newBuilder()
 					.setMessage("Hello " + user.getId() + " : " + user.getName())

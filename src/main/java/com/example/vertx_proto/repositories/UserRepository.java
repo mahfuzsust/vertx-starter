@@ -9,7 +9,7 @@ import io.vertx.core.Future;
 @VertxGen
 public interface UserRepository {
 	Future<Void> save(User foo);
-	Future<User> findById(Long id);
+	Future<User> getById(Long id);
 
 	static String ADDRESS = "repository.user";
 }

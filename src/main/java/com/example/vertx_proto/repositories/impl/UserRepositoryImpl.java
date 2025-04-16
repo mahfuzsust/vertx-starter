@@ -2,41 +2,23 @@ package com.example.vertx_proto.repositories.impl;
 
 import com.example.vertx_proto.models.User;
 import com.example.vertx_proto.repositories.UserRepository;
-import com.example.vertx_proto.utils.HibernateUtil;
 import io.vertx.core.Future;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
 
-public class UserRepositoryImpl implements UserRepository {
+import java.util.Optional;
+
+public class UserRepositoryImpl extends BaseRepository implements UserRepository {
 	@Override
 	public Future<Void> save(User user) {
-		Session session = HibernateUtil.getSessionFactory().openSession();
-
-		try (session) {
-			Transaction transaction = session.getTransaction();
-			transaction.begin();
-			session.persist(user);
-			transaction.commit();
-			return Future.succeededFuture();
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Future.failedFuture(e);
+		User entity = saveEntity(user);
+		if (entity == null) {
+			return Future.failedFuture(new Exception("Failed to save user"));
 		}
+		return Future.succeededFuture();
 	}
 
 	@Override
-	public Future<User> findById(Long id) {
-		try {
-			Session session = HibernateUtil.getSessionFactory().openSession();
-			User user = session.get(User.class, id);
-			session.close();
-			if (user == null) {
-				return Future.failedFuture(new Exception("User not found"));
-			}
-			return Future.succeededFuture(user);
-		} catch (Exception e) {
-			e.printStackTrace();
-			return Future.failedFuture(e);
-		}
+	public Future<User> getById(Long id) {
+		Optional<User> user = findById(User.class, id);
+		return user.map(Future::succeededFuture).orElseGet(() -> Future.failedFuture(new Exception("User not found")));
 	}
 }
