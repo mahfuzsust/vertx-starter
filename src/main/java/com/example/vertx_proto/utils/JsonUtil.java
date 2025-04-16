@@ -2,32 +2,37 @@ package com.example.vertx_proto.utils;
 
 import com.google.protobuf.Message;
 import com.google.protobuf.util.JsonFormat;
+import io.vertx.core.Future;
 import io.vertx.ext.web.RoutingContext;
 
 import java.util.function.Function;
 
 public class JsonUtil {
-	public static  <ReqT extends Message, ResT extends Message> void handleJsonRequest(
+	public static <ReqT extends Message, ResT extends Message> void handleJsonRequest(
 		RoutingContext ctx,
 		Message.Builder requestBuilder,
-		Function<ReqT, ResT> serviceCall
+		Function<ReqT, Future<ResT>> serviceCall
 	) {
 		try {
-			JsonFormat.parser().ignoringUnknownFields().merge(ctx.body().asString(), requestBuilder);
+			String requestBody = ctx.body().asString();
+
+			JsonFormat.parser().ignoringUnknownFields().merge(requestBody, requestBuilder);
 			@SuppressWarnings("unchecked")
 			ReqT request = (ReqT) requestBuilder.build();
 
-			ResT response = serviceCall.apply(request);
-			String jsonResponse = JsonFormat.printer().print(response);
+			serviceCall.apply(request).onSuccess(response -> {
+				try {
+					String json = JsonFormat.printer().print(response);
+					ctx.response().putHeader("Content-Type", "application/json").end(json);
+				} catch (Exception e) {
+					ctx.response().setStatusCode(500).end("{\"error\": \"" + e.getMessage() + "\"}");
+				}
+			}).onFailure(err -> {
+				ctx.response().setStatusCode(500).end("{\"error\": \"" + err.getMessage() + "\"}");
+			});
 
-			ctx.response()
-				.putHeader("Content-Type", "application/json")
-				.end(jsonResponse);
 		} catch (Exception e) {
-			ctx.response()
-				.setStatusCode(400)
-				.putHeader("Content-Type", "application/json")
-				.end("{\"error\": \"" + e.getMessage() + "\"}");
+			ctx.response().setStatusCode(400).end("{\"error\": \"" + e.getMessage() + "\"}");
 		}
 	}
 }

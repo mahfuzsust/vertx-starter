@@ -36,11 +36,16 @@ dependencies {
 	implementation("io.vertx:vertx-health-check")
 	implementation("io.vertx:vertx-web")
 	implementation("io.vertx:vertx-grpc")
+	implementation("io.vertx:vertx-codegen")
 	implementation("com.google.protobuf:protobuf-java:$protobufVersion")
 	implementation("com.google.protobuf:protobuf-java-util:$protobufVersion")
 	implementation("javax.annotation:javax.annotation-api:1.3.2")
+
+	annotationProcessor("io.vertx:vertx-codegen:${vertxVersion}:processor")
+
 	testImplementation("io.vertx:vertx-junit5")
 	testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
+
 	compileOnly( "io.grpc", "grpc-all", "1.71.0")
 
 	runtimeOnly("io.netty:netty-all:4.2.0.Final")
@@ -101,7 +106,11 @@ sourceSets{
 			srcDirs("src/main/protos")
 		}
 		java{
-			srcDirs("build/generated/source/proto/main/grpc" ,"build/generated/source/proto/main/java")
+			srcDirs(
+				"build/generated/source/proto/main/grpc" ,
+				"build/generated/source/proto/main/java",
+				"build/generated/sources/annotationProcessor/java/main"
+			)
 
 		}
 	}
