@@ -7,9 +7,10 @@ import io.vertx.core.Future;
 
 @ProxyGen
 @VertxGen
-public interface UserRepository {
-	Future<Void> save(User foo);
-	Future<User> getById(Long id);
-
-	static String ADDRESS = "repository.user";
+public interface UserRepository extends CrudRepository<User, Long> {
+	String ADDRESS = "repository.user";
+	Future<User> save(User entity);
+	Future<Void> deleteById(Long id);
+	Future<User> findById(Long id);
+	Future<User> update(User entity, Long id);
 }

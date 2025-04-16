@@ -8,7 +8,7 @@ import org.hibernate.Transaction;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class BaseRepository {
+public abstract class BaseRepository {
 	protected <R> R executeInTransaction(Function<EntityManager, R> action) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 
@@ -39,17 +39,30 @@ public class BaseRepository {
 	}
 
 	protected <T> T saveEntity(T entity) {
-		return executeInTransaction(em -> em.merge(entity)); // handles both insert/update
+		return executeInTransaction(em -> em.merge(entity));
 	}
 
-	protected <T, ID> Optional<T> findById(Class<T> type, ID id) {
+	protected <T, ID> Optional<T> findEntity(Class<T> type, ID id) {
 		return execute(em -> Optional.ofNullable(em.find(type, id)));
 	}
 
-	protected <T> void deleteEntity(T entity) {
+	protected <T> boolean deleteEntity(T entity) {
 		executeInTransaction(em -> {
-			em.remove(em.contains(entity) ? entity : em.merge(entity));
-			return null;
+			em.remove(entity);
+			return true;
 		});
+		return false;
+	}
+
+	protected <T, ID> T updateEntity(T item, ID id) {
+		executeInTransaction(em -> {
+			Optional<T> entity = (Optional<T>) findEntity(item.getClass(), id);
+			if (entity.isPresent()) {
+				return em.merge(item);
+			} else {
+				throw new RuntimeException("Entity not found");
+			}
+		});
+		return null;
 	}
 }

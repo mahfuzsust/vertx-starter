@@ -7,18 +7,30 @@ import com.example.vertx_proto.repositories.UserRepository;
 import com.example.vertx_proto.services.HelloService;
 import io.vertx.core.Future;
 
+import java.util.Random;
+
 public class HelloServiceImpl implements HelloService {
 	private final UserRepository userRepository;
+
 	public HelloServiceImpl(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 
 	@Override
 	public Future<HelloResponse> sayHello(HelloRequest request) {
-		userRepository.save(new User(request.getName()))
+		Future<User> userFuture = userRepository.save(new User(request.getName()))
+			.onSuccess(u -> {
+				if (u.getId() != 1L) {
+					u.setName("Hello " + new Random().nextInt(100));
+					userRepository.update(u, u.getId())
+						.onFailure(e -> System.err.println("Failed to update: " + e.getMessage()));
+					userRepository.deleteById(u.getId())
+						.onFailure(e -> System.err.println("Failed to delete: " + e.getMessage()));
+				}
+			})
 			.onFailure(err -> System.err.println("Failed to save user: " + err.getMessage()));
 
-		return userRepository.getById(1L)
+		return userRepository.findById(1L)
 			.compose(user -> {
 				HelloResponse response = HelloResponse.newBuilder()
 					.setMessage("Hello " + user.getId() + " : " + user.getName())
