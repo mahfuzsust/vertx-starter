@@ -11,7 +11,6 @@ import java.util.concurrent.TimeUnit;
 
 import static java.lang.System.currentTimeMillis;
 
-
 public class Main {
 	public static void main(String[] args) {
 		long startTime = currentTimeMillis();
@@ -26,9 +25,7 @@ public class Main {
 		futures.add(periodicProducerDeployment);
 
 		Future.join(futures)
-			.onSuccess(ok -> {
-				System.out.printf("✅ Application started in %d ms\n", (currentTimeMillis() - startTime));
-			})
+			.onSuccess(ok -> System.out.printf("✅ Application started in %d ms\n", (currentTimeMillis() - startTime)))
 			.onFailure(Throwable::printStackTrace);
 	}
 }

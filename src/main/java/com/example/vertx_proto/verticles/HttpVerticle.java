@@ -1,48 +1,33 @@
 package com.example.vertx_proto.verticles;
 
-import com.example.proto.HelloRequest;
-import com.example.proto.HelloResponse;
-import com.google.protobuf.util.JsonFormat;
+import com.example.vertx_proto.handlers.HelloHandler;
+import com.example.vertx_proto.services.HelloService;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
-import io.vertx.core.buffer.Buffer;
 import io.vertx.ext.web.Router;
-
-import java.nio.charset.StandardCharsets;
+import io.vertx.ext.web.handler.BodyHandler;
 
 public class HttpVerticle extends AbstractVerticle {
 	@Override
-	public void start(Promise<Void> startPromise) throws Exception {
-		Router router = Router.router(vertx);
+	public void start(Promise<Void> startPromise) {
+		Router rootRouter = Router.router(vertx);
+		rootRouter.route().handler(BodyHandler.create());
 
-		router.post("/api/:method").handler(ctx -> {
-			String method = ctx.pathParam("method");
-			ctx.request().body().onSuccess(buffer -> {
-				try {
-					String bufferString = buffer.toString(StandardCharsets.UTF_8);
-					HelloRequest.Builder builder = HelloRequest.newBuilder();
-					JsonFormat.parser().ignoringUnknownFields().merge(bufferString, builder);
-					HelloRequest request = builder.build();
-					HelloResponse response;
+		Router apiRouter = Router.router(vertx);
 
-					if (method.equals("sayHello")) {
-						response = HelloResponse.newBuilder()
-							.setMessage("Hello " + request.getName())
-							.build();
-					} else {
-						ctx.response().setStatusCode(404).end("Method not found");
-						return;
-					}
-					ctx.response()
-						.putHeader("Content-Type", "application/json")
-						.end(Buffer.buffer(response.toByteArray()));
+		HelloService helloService = new HelloService();
+		HelloHandler helloHandler = new HelloHandler(helloService);
+		helloHandler.mountRoutes(apiRouter);
 
-				} catch (Exception e) {
-					ctx.response().setStatusCode(500).end("Invalid request: " + e.getMessage());
-				}
-			});
-		});
+		rootRouter.route("/api/v1/*").subRouter(apiRouter);
 
-		vertx.createHttpServer().requestHandler(router).listen(8888);
+		vertx.createHttpServer()
+			.requestHandler(rootRouter)
+			.listen(8080)
+			.onSuccess(server -> {
+				System.out.println("Server running at http://localhost:" + server.actualPort());
+				startPromise.complete();
+			})
+			.onFailure(startPromise::fail);
 	}
 }
