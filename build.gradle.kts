@@ -70,7 +70,7 @@ val generateVertxProxyCodes = task<JavaCompile>("generateVerxProxyCodes") {
 		"-processor", "io.vertx.codegen.CodeGenProcessor",
 		"-Acodegen.output=${projectDir}/build/generated/source/annotationProcessor/java/main"
 	))
-	destinationDir = file("${projectDir}/build/generated/source/annotationProcessor/java/main")
+	destinationDirectory = file("${projectDir}/build/generated/source/annotationProcessor/java/main")
 }
 
 tasks.compileJava {

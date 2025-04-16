@@ -18,7 +18,7 @@ public class HelloServiceImpl implements HelloService {
 
 	@Override
 	public Future<HelloResponse> sayHello(HelloRequest request) {
-		Future<User> userFuture = userRepository.save(new User(request.getName()))
+		userRepository.save(new User(request.getName()))
 			.onSuccess(u -> {
 				if (u.getId() != 1L) {
 					u.setName("Hello " + new Random().nextInt(100));
