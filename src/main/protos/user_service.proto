@@ -12,7 +12,10 @@ message UpdateUserRequest {
 }
 
 message CreateUserRequest {
-	string name = 2;
+	string name = 1;
+}
+message CreateUserResponse {
+	int64 id = 1;
 }
 
 message GetUserRequest {
@@ -28,7 +31,7 @@ message DeleteUserRequest {
 }
 
 service UserService {
-	rpc Create (CreateUserRequest) returns (google.protobuf.Empty);
+	rpc Create (CreateUserRequest) returns (CreateUserResponse);
 	rpc Update (UpdateUserRequest) returns (google.protobuf.Empty);
 	rpc Get (GetUserRequest) returns (GetUserResponse);
 	rpc Delete (DeleteUserRequest) returns (google.protobuf.Empty);

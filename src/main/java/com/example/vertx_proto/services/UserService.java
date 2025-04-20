@@ -5,7 +5,7 @@ import com.google.protobuf.Empty;
 import io.vertx.core.Future;
 
 public interface UserService {
-	Future<Empty> createUser(CreateUserRequest user);
+	Future<CreateUserResponse> createUser(CreateUserRequest user);
 
 	Future<Empty> updateUser(UpdateUserRequest user);
 

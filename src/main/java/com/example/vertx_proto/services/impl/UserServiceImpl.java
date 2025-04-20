@@ -15,10 +15,12 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Future<Empty> createUser(CreateUserRequest user) {
+	public Future<CreateUserResponse> createUser(CreateUserRequest user) {
 		return userRepository.save(new User(user.getName()))
 			.compose(user1 -> {
-				Empty response = Empty.newBuilder().build();
+				CreateUserResponse response = CreateUserResponse.newBuilder()
+					.setId(user1.getId())
+					.build();
 				return Future.succeededFuture(response);
 			});
 	}
