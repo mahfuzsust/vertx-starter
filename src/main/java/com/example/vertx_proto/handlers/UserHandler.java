@@ -1,8 +1,9 @@
 package com.example.vertx_proto.handlers;
 
+import com.example.vertx_proto.CreateUserRequest;
 import com.example.vertx_proto.DeleteUserRequest;
 import com.example.vertx_proto.GetUserRequest;
-import com.example.vertx_proto.SaveUserRequest;
+import com.example.vertx_proto.UpdateUserRequest;
 import com.example.vertx_proto.services.UserService;
 import io.vertx.ext.web.Router;
 
@@ -18,10 +19,10 @@ public class UserHandler implements Handler {
 	@Override
 	public void mountRoutes(Router router) {
 		router.post("/UserService/Create").handler(ctx ->
-			handleJsonRequest(ctx, SaveUserRequest.newBuilder(), service::createUser)
+			handleJsonRequest(ctx, CreateUserRequest.newBuilder(), service::createUser)
 		);
 		router.post("/UserService/Update").handler(ctx ->
-			handleJsonRequest(ctx, SaveUserRequest.newBuilder(), service::updateUser)
+			handleJsonRequest(ctx, UpdateUserRequest.newBuilder(), service::updateUser)
 		);
 		router.post("/UserService/Get").handler(ctx ->
 			handleJsonRequest(ctx, GetUserRequest.newBuilder(), service::getUser)

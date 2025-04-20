@@ -1,9 +1,6 @@
 package com.example.vertx_proto.services.impl;
 
-import com.example.vertx_proto.DeleteUserRequest;
-import com.example.vertx_proto.GetUserRequest;
-import com.example.vertx_proto.GetUserResponse;
-import com.example.vertx_proto.SaveUserRequest;
+import com.example.vertx_proto.*;
 import com.example.vertx_proto.models.User;
 import com.example.vertx_proto.repositories.UserRepository;
 import com.example.vertx_proto.services.UserService;
@@ -18,7 +15,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Future<Empty> createUser(SaveUserRequest user) {
+	public Future<Empty> createUser(CreateUserRequest user) {
 		return userRepository.save(new User(user.getName()))
 			.compose(user1 -> {
 				Empty response = Empty.newBuilder().build();
@@ -27,7 +24,7 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public Future<Empty> updateUser(SaveUserRequest user) {
+	public Future<Empty> updateUser(UpdateUserRequest user) {
 		return userRepository.update(new User(user.getName()), user.getId())
 			.compose(user1 -> {
 				Empty response = Empty.newBuilder().build();

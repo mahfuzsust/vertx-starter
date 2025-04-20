@@ -6,8 +6,12 @@ option java_outer_classname = "UserServiceProto";
 
 import "google/protobuf/empty.proto";
 
-message SaveUserRequest {
+message UpdateUserRequest {
 	int64 id = 1;
+	string name = 2;
+}
+
+message CreateUserRequest {
 	string name = 2;
 }
 
@@ -24,8 +28,8 @@ message DeleteUserRequest {
 }
 
 service UserService {
-	rpc Create (SaveUserRequest) returns (google.protobuf.Empty);
-	rpc Update (SaveUserRequest) returns (google.protobuf.Empty);
+	rpc Create (CreateUserRequest) returns (google.protobuf.Empty);
+	rpc Update (UpdateUserRequest) returns (google.protobuf.Empty);
 	rpc Get (GetUserRequest) returns (GetUserResponse);
 	rpc Delete (DeleteUserRequest) returns (google.protobuf.Empty);
 }
