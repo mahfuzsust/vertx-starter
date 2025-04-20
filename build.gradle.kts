@@ -9,8 +9,8 @@ plugins {
 	id("com.google.protobuf") version "0.9.5"
 }
 
-group = "com.example"
-version = "1.0.0-SNAPSHOT"
+group = "com.example.vertx"
+version = "1.0.0"
 
 repositories {
 	mavenCentral()

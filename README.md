@@ -1,27 +1,44 @@
-= Vertx-proto
+Vertx starter
 
-image:https://img.shields.io/badge/vert.x-4.5.14-purple.svg[link="https://vertx.io"]
-
-This application was generated using http://start.vertx.io
-
-== Building
+### Building
 
 To launch your tests:
 ```
-./gradlew clean test
+./gradlew clean build
 ```
 
-To package your application:
-```
-./gradlew clean assemble
+Request templates
+
+```shell
+curl --location 'http://localhost:8080/api/v1/UserService/Create' \
+--header 'Content-Type: application/json' \
+--data '{
+    "name": "Test"
+}'
+
+curl --location 'http://localhost:8080/api/v1/UserService/Update' \
+--header 'Content-Type: application/json' \
+--data '{
+    "id": 1,
+    "name": "Test 1"
+}'
+
+curl --location 'http://localhost:8080/api/v1/UserService/Get' \
+--header 'Content-Type: application/json' \
+--data '{
+    "id": 1
+}'
+
+curl --location 'http://localhost:8080/api/v1/UserService/Delete' \
+--header 'Content-Type: application/json' \
+--data '{
+    "id": 1
+}'
+
 ```
 
-To run your application:
-```
-./gradlew clean run
-```
 
-== Help
+### Help
 
 * https://vertx.io/docs/[Vert.x Documentation]
 * https://stackoverflow.com/questions/tagged/vert.x?sort=newest&pageSize=15[Vert.x Stack Overflow]

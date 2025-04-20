@@ -1,1 +1,1 @@
-rootProject.name = "vertx-proto"
+rootProject.name = "vertx"
