@@ -1,24 +1,15 @@
-package com.example.vertx_proto.repositories.impl.lib;
+package com.example.vertx_proto.repositories.lib.impl;
 
 
 import com.example.vertx_proto.repositories.lib.CrudRepository;
 import io.vertx.core.Future;
 
-import java.lang.reflect.ParameterizedType;
 import java.util.Optional;
 import java.util.function.Consumer;
 
-public abstract class CrudRepositoryImpl<T, ID> extends BaseRepository implements CrudRepository<T, ID> {
-	private final Class<T> entityClass;
-
-	@SuppressWarnings("unchecked")
-	public CrudRepositoryImpl() {
-		this.entityClass = (Class<T>) ((ParameterizedType)
-			getClass().getGenericSuperclass()).getActualTypeArguments()[0];
-	}
-
+public abstract class CrudRepositoryImpl<T, ID> extends BaseRepository<T, ID> implements CrudRepository<T, ID> {
 	public Future<T> save(T entity) {
-		T result = saveEntity(entity);
+		T result = create(entity);
 		if (entity == null) {
 			return Future.failedFuture(new Exception("Failed to save"));
 		}
@@ -26,15 +17,12 @@ public abstract class CrudRepositoryImpl<T, ID> extends BaseRepository implement
 	}
 
 	public Future<Void> deleteById(ID id) {
-		Future<T> byId = findById(id)
-			.onSuccess(this::deleteEntity)
-			.onFailure(e -> System.err.println("Failed to delete: " + e.getMessage()));
-		return byId.map(v -> null);
+		return delete(id) ? Future.succeededFuture() : Future.failedFuture(new Error("Delete failed"));
 	}
 
 	@Override
 	public Future<T> findById(ID id) {
-		Optional<T> entity = findEntity(this.entityClass, id);
+		Optional<T> entity = getOne(id);
 		return entity.map(Future::succeededFuture).orElseGet(() -> Future.failedFuture(new Exception("Entity not found")));
 	}
 

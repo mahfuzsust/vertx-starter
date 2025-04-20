@@ -46,11 +46,13 @@ dependencies {
 	implementation("org.reflections:reflections:0.10.2")
 
 	annotationProcessor("io.vertx:vertx-codegen:${vertxVersion}:processor")
+	annotationProcessor("io.vertx:vertx-codegen:${vertxVersion}")
 
 	testImplementation("io.vertx:vertx-junit5")
 	testImplementation("org.junit.jupiter:junit-jupiter:$junitJupiterVersion")
 
 	compileOnly( "io.grpc", "grpc-all", "1.71.0")
+	compileOnly("io.vertx:vertx-codegen:${vertxVersion}")
 
 	runtimeOnly("io.netty:netty-all:4.2.0.Final")
 	runtimeOnly("org.postgresql:postgresql:42.7.5")
@@ -59,8 +61,11 @@ dependencies {
 java {
 	sourceCompatibility = JavaVersion.VERSION_17
 	targetCompatibility = JavaVersion.VERSION_17
-}
 
+	toolchain {
+		languageVersion.set(JavaLanguageVersion.of(17))
+	}
+}
 
 val generateVertxProxyCodes = task<JavaCompile>("generateVerxProxyCodes") {
 	source = sourceSets["main"].java
@@ -77,6 +82,9 @@ val generateVertxProxyCodes = task<JavaCompile>("generateVerxProxyCodes") {
 tasks.compileJava {
 	dependsOn(generateVertxProxyCodes)
 	source += sourceSets["generated"].java
+
+	options.release.set(17)
+
 	options.compilerArgs.plus("-proc:none")
 }
 
