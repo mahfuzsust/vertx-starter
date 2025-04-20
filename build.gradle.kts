@@ -69,9 +69,9 @@ val generateVertxProxyCodes = task<JavaCompile>("generateVerxProxyCodes") {
 	options.compilerArgs.addAll(listOf(
 		"-proc:only",
 		"-processor", "io.vertx.codegen.CodeGenProcessor",
-		"-Acodegen.output=${projectDir}/build/generated/source/annotationProcessor/java/main"
+		"-Acodegen.output=${projectDir}/build/generated/sources/annotationProcessor/java/main"
 	))
-	destinationDirectory = file("${projectDir}/build/generated/source/annotationProcessor/java/main")
+	destinationDirectory = file("${projectDir}/build/generated/sources/annotationProcessor/java/main")
 }
 
 tasks.compileJava {
@@ -138,13 +138,13 @@ sourceSets{
 			srcDirs(
 				"build/generated/source/proto/main/grpc" ,
 				"build/generated/source/proto/main/java",
-				"build/generated/source/annotationProcessor/java/main"
+				"build/generated/sources/annotationProcessor/java/main"
 			)
 
 		}
 	}
 	create("generated") {
-		java.srcDir("${projectDir}/build/generated/source/annotationProcessor/java/main")
+		java.srcDir("${projectDir}/build/generated/sources/annotationProcessor/java/main")
 		compileClasspath = sourceSets["main"].compileClasspath
 		runtimeClasspath = sourceSets["main"].runtimeClasspath
 	}

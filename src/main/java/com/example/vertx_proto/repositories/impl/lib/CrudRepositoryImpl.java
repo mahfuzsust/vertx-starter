@@ -1,7 +1,7 @@
-package com.example.vertx_proto.repositories.impl;
+package com.example.vertx_proto.repositories.impl.lib;
 
 
-import com.example.vertx_proto.repositories.CrudRepository;
+import com.example.vertx_proto.repositories.lib.CrudRepository;
 import io.vertx.core.Future;
 
 import java.lang.reflect.ParameterizedType;
@@ -38,9 +38,12 @@ public abstract class CrudRepositoryImpl<T, ID> extends BaseRepository implement
 		return entity.map(Future::succeededFuture).orElseGet(() -> Future.failedFuture(new Exception("Entity not found")));
 	}
 
-	public Future<T> update(Consumer<T> entity, ID id) {
+	public abstract Consumer<T> getUpdateEntity(T entity, ID id);
+
+	@Override
+	public Future<T> update(T entity, ID id) {
 		try {
-			Optional<T> t = updateById(entity, id, entityClass);
+			Optional<T> t = updateById(getUpdateEntity(entity, id), id, entityClass);
 			return t.map(Future::succeededFuture).orElseGet(() -> Future.failedFuture(new Exception("Failed to update")));
 		} catch (Exception e) {
 			return Future.failedFuture(new Exception("Failed to update"));

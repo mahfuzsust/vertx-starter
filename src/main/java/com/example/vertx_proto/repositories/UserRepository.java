@@ -1,6 +1,7 @@
 package com.example.vertx_proto.repositories;
 
 import com.example.vertx_proto.models.User;
+import com.example.vertx_proto.repositories.lib.CrudRepository;
 import io.vertx.codegen.annotations.ProxyGen;
 import io.vertx.codegen.annotations.VertxGen;
 import io.vertx.core.Future;

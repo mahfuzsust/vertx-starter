@@ -1,4 +1,4 @@
-package com.example.vertx_proto.repositories.impl;
+package com.example.vertx_proto.repositories.impl.lib;
 
 import com.example.vertx_proto.utils.HibernateUtil;
 import jakarta.persistence.EntityManager;
@@ -10,57 +10,52 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 
 public abstract class BaseRepository {
-	protected <R> R executeInTransaction(Function<EntityManager, R> action) {
+	protected <R> R execute(Function<EntityManager, R> action, boolean inTransaction) {
 		Session session = HibernateUtil.getSessionFactory().openSession();
 
+		Transaction transaction = null;
 		try (session) {
-			Transaction transaction = session.getTransaction();
-			transaction.begin();
+			if (inTransaction) {
+				transaction = session.getTransaction();
+				transaction.begin();
+			}
 			R result = action.apply(session);
-			transaction.commit();
+
+			if (inTransaction) {
+				transaction.commit();
+			}
 			return result;
 		} catch (Exception e) {
 			e.printStackTrace();
-			if (session.getTransaction().isActive()) {
+			if (inTransaction && session.getTransaction().isActive()) {
 				session.getTransaction().rollback();
 			}
 			throw new RuntimeException(e);
 		}
 	}
 
-	protected <R> R execute(Function<EntityManager, R> action) {
-		Session session = HibernateUtil.getSessionFactory().openSession();
-
-		try (session) {
-			return action.apply(session);
-		} catch (Exception e) {
-			e.printStackTrace();
-			throw new RuntimeException(e);
-		}
-	}
-
 	protected <T> T saveEntity(T entity) {
-		return executeInTransaction(em -> em.merge(entity));
+		return execute(em -> em.merge(entity), true);
 	}
 
 	protected <T, ID> Optional<T> findEntity(Class<T> type, ID id) {
-		return execute(em -> Optional.ofNullable(em.find(type, id)));
+		return execute(em -> Optional.ofNullable(em.find(type, id)), false);
 	}
 
 	protected <T> boolean deleteEntity(T entity) {
-		executeInTransaction(em -> {
+		execute(em -> {
 			em.remove(entity);
 			return true;
-		});
+		}, true);
 		return false;
 	}
 
 	protected <T, ID> Optional<T> updateById(Consumer<T> updater, ID id, Class<T> classType) {
-		return executeInTransaction(em -> {
+		return execute(em -> {
 			T existing = em.find(classType, id);
 			if (existing == null) return Optional.empty();
 			updater.accept(existing);
 			return Optional.of(existing);
-		});
+		}, true);
 	}
 }
