@@ -51,6 +51,7 @@ public class Main {
 			if (session.getTransaction().isActive()) {
 				session.getTransaction().rollback();
 			}
+			System.out.println("Create table failed");
 			e.printStackTrace();
 		}
 	}
